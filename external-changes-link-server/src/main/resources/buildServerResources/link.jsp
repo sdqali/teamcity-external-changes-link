@@ -1,1 +1,1 @@
-<span>${url} - ${revision}</span>
+Fetch Url: <span>${fetchUrl}</span>

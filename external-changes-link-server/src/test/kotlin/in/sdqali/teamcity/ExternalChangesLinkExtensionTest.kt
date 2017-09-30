@@ -1,5 +1,6 @@
 package `in`.sdqali.teamcity
 
+import jetbrains.buildServer.vcs.impl.VcsRootInstanceImpl
 import jetbrains.buildServer.web.openapi.PagePlace
 import jetbrains.buildServer.web.openapi.PagePlaces
 import jetbrains.buildServer.web.openapi.PlaceId
@@ -10,6 +11,7 @@ import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import javax.servlet.http.HttpServletRequest
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class ExternalChangesLinkExtensionTest {
@@ -47,5 +49,19 @@ class ExternalChangesLinkExtensionTest {
         val request = mock(HttpServletRequest::class.java)
         `when`(request.getAttribute("tab")).thenReturn("artifacts")
         assertFalse("Extension should not be available, but is.", extension.isAvailable(request))
+    }
+
+    @Test
+    fun testExtractsUrlForVcsRootAvailable() {
+        val request = mock(HttpServletRequest::class.java)
+        val vcsRoot = mock(VcsRootInstanceImpl::class.java)
+        val model = mutableMapOf<String, Any>()
+
+        `when`(request.getAttribute("tab")).thenReturn("buildChangesDiv")
+        `when`(vcsRoot.getProperty("url")).thenReturn("https://github.com/JetBrains/kotlin.git")
+        `when`(request.getAttribute("vcsRoot")).thenReturn(vcsRoot)
+
+        extension.fillModel(model, request)
+        assertEquals("https://github.com/JetBrains/kotlin.git", model["fetchUrl"])
     }
 }
