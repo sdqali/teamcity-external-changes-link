@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/sdqali/teamcity-external-changes-link.svg?branch=master)](https://travis-ci.org/sdqali/teamcity-external-changes-link)
 
  TeamCity server-side plugin
 
