@@ -54,8 +54,13 @@
             <version>2.9.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains.teamcity</groupId>
+            <artifactId>tests-support</artifactId>
+            <version>10.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
-
     <build>
         <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
         <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
