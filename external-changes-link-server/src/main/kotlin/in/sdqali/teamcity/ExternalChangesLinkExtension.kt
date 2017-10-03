@@ -46,8 +46,9 @@ class ExternalChangesLinkExtension : SimplePageExtension {
 
     private fun guessUrlFrom(revision: String, url: String?): String {
         url?.let {
+            val repoPath = url.replace(Regex("\\.git$"), "")
             return when {
-                it.matches(Regex(".*github.*")) -> "$url/commit/$revision"
+                repoPath.matches(Regex(".*github.*")) -> "$repoPath/commit/$revision"
                 else -> ""
             }
         } ?: return ""

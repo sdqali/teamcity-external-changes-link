@@ -76,6 +76,21 @@ class ExternalChangesLinkExtensionTest {
         assertEquals("https://github.com/sdqali/todo.kotlin/commit/test-revision", input["url"])
     }
 
+    @Test
+    fun deducesUrlForHttpCheckout() {
+        val request = createRequest("/viewLog.html", "/", "buildChangesDiv")
+        val buildParams = mapOf("external.changes.viewer.template" to "")
+        val buildData = buildDataFor("test-revision", 12345678, buildParams)
+        val vcsRoot = vcsRootInstance(12345678, "https://github.com/sdqali/todo.kotlin.git")
+
+        given(request.getAttribute("buildData")).willReturn(buildData)
+        given(request.getAttribute("vcsRoot")).willReturn(vcsRoot)
+
+        val input = mutableMapOf<String, Any>()
+        extension.fillModel(input, request)
+        assertEquals("https://github.com/sdqali/todo.kotlin/commit/test-revision", input["url"])
+    }
+
     private fun buildDataFor(revision: String, vcsRootId: Long, buildParams: Map<String, String>): BaseBuild {
         val buildData = mock(BaseBuild::class.java)
         val vcsRoot = vcsRootInstance(vcsRootId, "https://github.com/sdqali/todo.kotlin")
