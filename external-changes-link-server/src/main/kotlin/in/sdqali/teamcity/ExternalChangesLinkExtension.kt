@@ -55,6 +55,7 @@ class ExternalChangesLinkExtension : SimplePageExtension {
             return when {
                 urIish.host.matches(Regex(".*github.*")) -> "$scheme://${urIish.host}/$repoPath/commit/$revision"
                 urIish.host.matches(Regex(".*gitlab.*")) -> "$scheme://${urIish.host}/$repoPath/commit/$revision"
+                urIish.host.matches(Regex(".*bitbucket.*")) -> "$scheme://${urIish.host}/$repoPath/commits/$revision"
                 else -> ""
             }
         } ?: return ""

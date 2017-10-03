@@ -135,6 +135,36 @@ class ExternalChangesLinkExtensionTest {
         assertEquals("https://gitlab.com/M1106/projet/commit/b974803fbb04c65793860a351564bc0f9246d6d9", input["url"])
     }
 
+    @Test
+    fun deducesBitBucketSshUrls() {
+        val request = createRequest("/viewLog.html", "/", "buildChangesDiv")
+        val buildParams = mapOf("external.changes.viewer.template" to "")
+        val buildData = buildDataFor("39925bab7ee1390ee6475d8793d5bf8a57751aca", 12345678, buildParams)
+        val vcsRoot = vcsRootInstance(12345678, "git@bitbucket.org:sdqali/hello-world.git")
+
+        given(request.getAttribute("buildData")).willReturn(buildData)
+        given(request.getAttribute("vcsRoot")).willReturn(vcsRoot)
+
+        val input = mutableMapOf<String, Any>()
+        extension.fillModel(input, request)
+        assertEquals("http://bitbucket.org/sdqali/hello-world/commits/39925bab7ee1390ee6475d8793d5bf8a57751aca", input["url"])
+    }
+
+    @Test
+    fun deducesBitBucketHttpUrls() {
+        val request = createRequest("/viewLog.html", "/", "buildChangesDiv")
+        val buildParams = mapOf("external.changes.viewer.template" to "")
+        val buildData = buildDataFor("39925bab7ee1390ee6475d8793d5bf8a57751aca", 12345678, buildParams)
+        val vcsRoot = vcsRootInstance(12345678, "https://bitbucket.org/sdqali/hello-world.git")
+
+        given(request.getAttribute("buildData")).willReturn(buildData)
+        given(request.getAttribute("vcsRoot")).willReturn(vcsRoot)
+
+        val input = mutableMapOf<String, Any>()
+        extension.fillModel(input, request)
+        assertEquals("https://bitbucket.org/sdqali/hello-world/commits/39925bab7ee1390ee6475d8793d5bf8a57751aca", input["url"])
+    }
+
     private fun buildDataFor(revision: String, vcsRootId: Long, buildParams: Map<String, String>): BaseBuild {
         val buildData = mock(BaseBuild::class.java)
         val vcsRoot = vcsRootInstance(vcsRootId, "https://github.com/sdqali/todo.kotlin")
