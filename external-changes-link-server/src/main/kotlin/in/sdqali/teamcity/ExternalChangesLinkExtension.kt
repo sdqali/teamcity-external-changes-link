@@ -6,6 +6,7 @@ import jetbrains.buildServer.web.openapi.PagePlaces
 import jetbrains.buildServer.web.openapi.PlaceId
 import jetbrains.buildServer.web.openapi.PluginDescriptor
 import jetbrains.buildServer.web.openapi.SimplePageExtension
+import org.eclipse.jgit.transport.URIish
 import org.jetbrains.annotations.NotNull
 import javax.servlet.http.HttpServletRequest
 
@@ -44,11 +45,15 @@ class ExternalChangesLinkExtension : SimplePageExtension {
         }
     }
 
-    private fun guessUrlFrom(revision: String, url: String?): String {
-        url?.let {
-            val repoPath = url.replace(Regex("\\.git$"), "")
+    private fun guessUrlFrom(revision: String, urlProperty: String?): String {
+        urlProperty?.let {
+            val urIish = URIish(urlProperty)
+            val repoPath = urIish.path
+                .replace(Regex("\\.git$"), "")
+                .replace(Regex("^/"), "")
+            val scheme = if (urIish.scheme == "https")  "https" else "http"
             return when {
-                repoPath.matches(Regex(".*github.*")) -> "$repoPath/commit/$revision"
+                urIish.host.matches(Regex(".*github.*")) -> "$scheme://${urIish.host}/$repoPath/commit/$revision"
                 else -> ""
             }
         } ?: return ""

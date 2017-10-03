@@ -10,7 +10,7 @@ import jetbrains.buildServer.web.openapi.PlaceId
 import jetbrains.buildServer.web.openapi.PluginDescriptor
 import org.junit.Before
 import org.junit.Test
-import org.mockito.BDDMockito.*
+import org.mockito.BDDMockito.given
 import org.mockito.Mockito.mock
 import javax.servlet.http.HttpServletRequest
 import kotlin.test.assertEquals
@@ -22,14 +22,13 @@ class ExternalChangesLinkExtensionTest {
     private lateinit var pagePlaces: PagePlaces
     private lateinit var descriptor: PluginDescriptor
     private lateinit var pagePlace: PagePlace
-    private lateinit var placeId: PlaceId
 
     @Before
     fun setup() {
         pagePlace = mock(PagePlace::class.java)
         pagePlaces = mock(PagePlaces::class.java)
         descriptor = mock(PluginDescriptor::class.java)
-        `when`(pagePlaces.getPlaceById(PlaceId.VCS_ROOT_IN_BUILD_NOTE)).thenReturn(pagePlace)
+        given(pagePlaces.getPlaceById(PlaceId.VCS_ROOT_IN_BUILD_NOTE)).willReturn(pagePlace)
         extension = ExternalChangesLinkExtension(pagePlaces, descriptor)
     }
 
@@ -89,6 +88,21 @@ class ExternalChangesLinkExtensionTest {
         val input = mutableMapOf<String, Any>()
         extension.fillModel(input, request)
         assertEquals("https://github.com/sdqali/todo.kotlin/commit/test-revision", input["url"])
+    }
+
+    @Test
+    fun deducesUrlForSshCheckout() {
+        val request = createRequest("/viewLog.html", "/", "buildChangesDiv")
+        val buildParams = mapOf("external.changes.viewer.template" to "")
+        val buildData = buildDataFor("test-revision", 12345678, buildParams)
+        val vcsRoot = vcsRootInstance(12345678, "git@github.com:sdqali/todo.kotlin.git")
+
+        given(request.getAttribute("buildData")).willReturn(buildData)
+        given(request.getAttribute("vcsRoot")).willReturn(vcsRoot)
+
+        val input = mutableMapOf<String, Any>()
+        extension.fillModel(input, request)
+        assertEquals("http://github.com/sdqali/todo.kotlin/commit/test-revision", input["url"])
     }
 
     private fun buildDataFor(revision: String, vcsRootId: Long, buildParams: Map<String, String>): BaseBuild {
