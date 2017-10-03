@@ -54,6 +54,7 @@ class ExternalChangesLinkExtension : SimplePageExtension {
             val scheme = if (urIish.scheme == "https")  "https" else "http"
             return when {
                 urIish.host.matches(Regex(".*github.*")) -> "$scheme://${urIish.host}/$repoPath/commit/$revision"
+                urIish.host.matches(Regex(".*gitlab.*")) -> "$scheme://${urIish.host}/$repoPath/commit/$revision"
                 else -> ""
             }
         } ?: return ""

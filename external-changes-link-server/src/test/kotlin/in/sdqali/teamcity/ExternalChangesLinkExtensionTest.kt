@@ -105,6 +105,36 @@ class ExternalChangesLinkExtensionTest {
         assertEquals("http://github.com/sdqali/todo.kotlin/commit/test-revision", input["url"])
     }
 
+    @Test
+    fun deducesGitLabSshUrls() {
+        val request = createRequest("/viewLog.html", "/", "buildChangesDiv")
+        val buildParams = mapOf("external.changes.viewer.template" to "")
+        val buildData = buildDataFor("b974803fbb04c65793860a351564bc0f9246d6d9", 12345678, buildParams)
+        val vcsRoot = vcsRootInstance(12345678, "git@gitlab.com:M1106/projet.git")
+
+        given(request.getAttribute("buildData")).willReturn(buildData)
+        given(request.getAttribute("vcsRoot")).willReturn(vcsRoot)
+
+        val input = mutableMapOf<String, Any>()
+        extension.fillModel(input, request)
+        assertEquals("http://gitlab.com/M1106/projet/commit/b974803fbb04c65793860a351564bc0f9246d6d9", input["url"])
+    }
+
+    @Test
+    fun deducesGitLabHttpsUrls() {
+        val request = createRequest("/viewLog.html", "/", "buildChangesDiv")
+        val buildParams = mapOf("external.changes.viewer.template" to "")
+        val buildData = buildDataFor("b974803fbb04c65793860a351564bc0f9246d6d9", 12345678, buildParams)
+        val vcsRoot = vcsRootInstance(12345678, "https://gitlab.com/M1106/projet.git")
+
+        given(request.getAttribute("buildData")).willReturn(buildData)
+        given(request.getAttribute("vcsRoot")).willReturn(vcsRoot)
+
+        val input = mutableMapOf<String, Any>()
+        extension.fillModel(input, request)
+        assertEquals("https://gitlab.com/M1106/projet/commit/b974803fbb04c65793860a351564bc0f9246d6d9", input["url"])
+    }
+
     private fun buildDataFor(revision: String, vcsRootId: Long, buildParams: Map<String, String>): BaseBuild {
         val buildData = mock(BaseBuild::class.java)
         val vcsRoot = vcsRootInstance(vcsRootId, "https://github.com/sdqali/todo.kotlin")
